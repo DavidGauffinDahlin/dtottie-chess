@@ -14,8 +14,10 @@ fn main() {
         io::stdin()
             .read_line(&mut input)
             .expect("failed to read line");
-        game1.player_move(input);
+        let _ = game1.player_move(input);
         //print!("\x1B[2J\x1B[1;1H");
         game1.print_board();
+        //let id = game1.board[7][0].unique_name;
+        //println!("{}", id);
     }
 }

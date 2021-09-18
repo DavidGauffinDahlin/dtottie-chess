@@ -1,7 +1,15 @@
 #[macro_export]
+macro_rules! scan_threat {
+    ($position:expr, $board:expr) => {
+        match $board[$position.0][$position.1] {}
+    };
+}
+
+#[macro_export]
 macro_rules! scan {
     ($piece:expr,$position:expr,$board:expr,$allowed_board:expr,$reverse:expr,$horizontal:expr,$diagonal:expr) => {{
         let mut block = false;
+        //validera input för att undvika att go out of range vid indexering av brädet
         if $horizontal == 0 {
             if $reverse == 0 {
                 if $position.0 > 8 {
