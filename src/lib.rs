@@ -27,13 +27,39 @@ mod tests {
         assert!(game1.board[3][2].passant == false);
     }
     #[test]
-    fn check_king() {
+    fn check_king_knight() {
         let mut game1 = crate::Game::new_game();
         let moves = ["B8C6\n", "A2A3\n", "C6D4\n", "A3A4\n", "D4C2\n"];
         for pmove in moves {
             let _ = game1.player_move(pmove.to_owned());
         }
         assert!(game1.b_checked);
+    }
+    #[test]
+    fn check_king_other() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "F2F3\n", "D8H4\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.b_checked);
+    }
+    #[test]
+    fn cant_move_locked_piece() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "A2A3\n", "D8H4\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("F2F3\n".to_owned()).is_err());
+    }
+    #[test]
+    fn move_king_clears_lock_and_check() {
+        panic!();
+    }
+    #[test]
+    fn takedown_clears_lock_and_check() {
+        panic!();
     }
 }
 
@@ -121,21 +147,18 @@ impl Game {
                 return Err("Internal Error");
             }
         };
-        //let to = to.to_owned();
-        //let to = to - 1;
+
         let i = table.iter().position(|&s| s == &input[0..1]).unwrap();
         let j = table.iter().position(|&s| s == &input[2..3]).unwrap();
-        //println!("from {}, to {}", from, to);
-        //check piece, confirm that its this piece's turn
 
+        //check piece, confirm that its this piece's turn
         let piece = &mut self.board[from][i].clone();
         if piece.id == ' ' || piece.color_white != self.turn_white {
             return Err("Illegal move: Wrong player turn");
         }
-        //if self.board[i][from[1..2] as usize] {}
-        //println!("index of {} is {}", &input[0..1], i.unwrap());
+
         //calculate legal move
-        if piece.legal_move(&self.board, (from, i), (to, j)) {
+        if piece.legal_move(&mut self.board, (from, i), (to, j), false) {
             //check if the move opens up an opportunity for en passant.
             if ((from == 6 && to == 4) || (from == 1 && to == 3)) && piece.kind == PieceKind::Pawn {
                 piece.passant = true;
@@ -144,6 +167,13 @@ impl Game {
             self.board[from][i] = Default::default();
 
             //scan to see if the moved piece is checking the king.
+            if piece.legal_move(&mut self.board, (from, i), (to, j), true) {
+                if piece.color_white {
+                    self.b_checked = true;
+                } else {
+                    self.w_checked = true;
+                }
+            }
 
             self.turn_white = !self.turn_white;
             //remove passants of the opposite team
@@ -159,8 +189,6 @@ impl Game {
         } else {
             return Err("Illegal move");
         }
-        //update board
-        //change turn
     }
 
     pub fn print_board(&self) {

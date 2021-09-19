@@ -7,7 +7,9 @@ macro_rules! scan_threat {
 
 #[macro_export]
 macro_rules! scan {
-    ($piece:expr,$position:expr,$board:expr,$allowed_board:expr,$reverse:expr,$horizontal:expr,$diagonal:expr) => {{
+    ($piece:expr,$position:expr,$board:expr,$allowed_board:expr,$reverse:expr,$horizontal:expr,$diagonal:expr, $checkcheck:expr) => {{
+        let mut locked_board = [[true; 8]; 8];
+        let mut locked_temp = vec![];
         let mut block = false;
         //validera input för att undvika att go out of range vid indexering av brädet
         if $horizontal == 0 {
@@ -63,19 +65,37 @@ macro_rules! scan {
                             match ($horizontal, $diagonal) {
                                 (1, 1) => {
                                     if $position.0 + i < 8 && $position.1 + i < 8 {
-                                        $allowed_board[$position.0 + i][$position.1 + i] = true
+                                        $allowed_board[$position.0 + i][$position.1 + i] = true;
+                                        if $checkcheck && location.kind != PieceKind::King {
+                                            locked_temp.push((($position.0 + i), ($position.1 + i)))
+                                        }
                                     }
                                 }
                                 (_, 1) => {
                                     if $position.1 >= i && $position.0 + i < 8 {
-                                        $allowed_board[$position.0 + i][$position.1 - i] = true
+                                        $allowed_board[$position.0 + i][$position.1 - i] = true;
+                                        if $checkcheck && location.kind != PieceKind::King {
+                                            locked_temp.push((($position.0 + i), ($position.1 - i)))
+                                        }
                                     }
                                 }
-                                (1, _) => $allowed_board[$position.0][i] = true,
-                                (_, _) => $allowed_board[i][$position.1] = true,
+                                (1, _) => {
+                                    $allowed_board[$position.0][i] = true;
+                                    if $checkcheck && location.kind != PieceKind::King {
+                                        locked_temp.push((($position.0), (i)))
+                                    }
+                                }
+                                (_, _) => {
+                                    $allowed_board[i][$position.1] = true;
+                                    if $checkcheck && location.kind != PieceKind::King {
+                                        locked_temp.push(((i), ($position.1)))
+                                    }
+                                }
                             };
                         }
-                        block = true;
+                        if $checkcheck == false && location.kind != PieceKind::King {
+                            block = true;
+                        }
                     }
                     if block == false {
                         match ($horizontal, $diagonal) {
@@ -95,6 +115,11 @@ macro_rules! scan {
                     }
                 }
             }
+            if block == true && $checkcheck {
+                for places in locked_temp {
+                    locked_board[places.0][places.1] = true;
+                }
+            }
         } else {
             let iter = match ($horizontal, $diagonal) {
                 (_, 1) => 1..7,
@@ -102,8 +127,8 @@ macro_rules! scan {
                 (_, _) => (0..($position.0)),
             };
             for i in iter.rev() {
+                locked_temp.clear();
                 let j = if $diagonal == 1 { 7 - i } else { i };
-                println!("{}", j);
                 if block == false {
                     let location = match ($horizontal, $diagonal) {
                         (1, 1) => {
@@ -128,19 +153,44 @@ macro_rules! scan {
                             match ($horizontal, $diagonal) {
                                 (1, 1) => {
                                     if $position.0 >= j && $position.1 + j < 8 {
-                                        $allowed_board[$position.0 - j][$position.1 + j] = true
+                                        $allowed_board[$position.0 - j][$position.1 + j] = true;
+                                        if $checkcheck && location.kind != PieceKind::King {
+                                            locked_temp.push((($position.0 - j), ($position.1 + j)))
+                                        }
                                     }
                                 }
+
                                 (_, 1) => {
                                     if $position.0 >= j && $position.1 >= j {
-                                        $allowed_board[$position.0 - j][$position.1 - j] = true
+                                        $allowed_board[$position.0 - j][$position.1 - j] = true;
+                                        if $checkcheck && location.kind != PieceKind::King {
+                                            locked_temp.push((($position.0 - j), ($position.1 - j)))
+                                        }
                                     }
                                 }
-                                (1, _) => $allowed_board[$position.0][i] = true,
-                                (_, _) => $allowed_board[i][$position.1] = true,
+
+                                (1, _) => {
+                                    $allowed_board[$position.0][i] = true;
+                                    if $checkcheck && location.kind != PieceKind::King {
+                                        locked_temp.push((($position.0), (i)))
+                                    }
+                                }
+                                (_, _) => {
+                                    $allowed_board[i][$position.1] = true;
+                                    if $checkcheck && location.kind != PieceKind::King {
+                                        locked_temp.push(((i), ($position.1)))
+                                    }
+                                }
                             };
                         }
-                        block = true;
+
+                        if $checkcheck == true && location.kind == PieceKind::King {
+                            block = true;
+                        }
+
+                        if $checkcheck == false && location.kind != PieceKind::King {
+                            block = true;
+                        }
                     }
                     if block == false {
                         match ($horizontal, $diagonal) {
@@ -160,7 +210,17 @@ macro_rules! scan {
                     }
                 }
             }
+            if block == true && $checkcheck {
+                for places in locked_temp {
+                    locked_board[places.0][places.1] = true;
+                }
+            }
         }
-        $allowed_board
+
+        if !$checkcheck {
+            $allowed_board
+        } else {
+            locked_board
+        }
     }};
 }

@@ -17,6 +17,7 @@ fn main() {
         let _ = game1.player_move(input);
         //print!("\x1B[2J\x1B[1;1H");
         game1.print_board();
+        println!("{}", game1.b_checked);
         //let id = game1.board[7][0].unique_name;
         //println!("{}", id);
     }
