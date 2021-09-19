@@ -21,4 +21,9 @@ fn main() {
         //let id = game1.board[7][0].unique_name;
         //println!("{}", id);
     }
+    // let moves = ["E7E6\n", "A2A3\n", "E8E7\n"];
+    // for pmove in moves {
+    //     game1.player_move(pmove.to_owned());
+    //     game1.print_board();
+    // }
 }

@@ -234,29 +234,45 @@ impl Piece {
         //King
         if self.kind == PieceKind::King {
             //calculate legal move from the target square?
-            //calculation from all adjacent squares must be done at the
-            //beginning of each turn if and only if the king is checked
+            let adjacent_tiles = [
+                (1, 0),
+                (1, 1),
+                (0, 1),
+                (-1, 1),
+                (-1, 0),
+                (-1, -1),
+                (0, -1),
+                (1, -1),
+            ];
+            allowed_board = king_scan!(start, board, allowed_board, adjacent_tiles);
+            //println!("{:?}", allowed_board);
         }
 
-        // for i in 0..8 as usize {
-        //     print!("{}  ", i + 1);
-        //     for j in 0..8 as usize {
-        //         print!("{} ", allowed_board[i][j]);
-        //     }
-        //     print!("\n");
-        // }
+        if !check_for_check {
+            for i in 0..8 as usize {
+                print!("{}  ", i + 1);
+                for j in 0..8 as usize {
+                    print!("{} ", allowed_board[i][j]);
+                }
+                print!("\n");
+            }
+        }
         //confirm the move is in the array of allowed moves
         if check_for_check {
             for i in 0..8 {
                 for j in 0..8 {
-                    if locked_board[i][j] == true {
+                    if locked_board[i][j] == true && board[i][j].kind != PieceKind::King {
+                        println!("{},{} locked", i, j);
                         board[i][j].locked = true;
                     }
                 }
             }
             for i in 0..8 {
-                if locked_board[i].contains(&true) {
-                    return true;
+                for j in 0..6 {
+                    if locked_board[i][j] == true {
+                        println!("this is reached, the board contains true and we return true");
+                        return true;
+                    }
                 }
             }
             return false;

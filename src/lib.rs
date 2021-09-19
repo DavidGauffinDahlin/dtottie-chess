@@ -55,11 +55,26 @@ mod tests {
     }
     #[test]
     fn move_king_clears_lock_and_check() {
-        panic!();
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "D2D3\n", "D8H4\n", "E1D2"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(!game1.board[0][5].locked);
+        assert!(!game1.b_checked);
     }
     #[test]
     fn takedown_clears_lock_and_check() {
         panic!();
+    }
+    #[test]
+    fn threat_doesnt_lock_all_pieces_bug() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "D2D3\n", "D8H4\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(!game1.board[7][1].locked);
     }
 }
 
@@ -158,7 +173,10 @@ impl Game {
         }
 
         //calculate legal move
-        if piece.legal_move(&mut self.board, (from, i), (to, j), false) {
+        println!("{} is locked: {}", piece.id, piece.locked);
+        if piece.legal_move(&mut self.board, (from, i), (to, j), false)
+            && !(piece.locked && piece.kind != PieceKind::King)
+        {
             //check if the move opens up an opportunity for en passant.
             if ((from == 6 && to == 4) || (from == 1 && to == 3)) && piece.kind == PieceKind::Pawn {
                 piece.passant = true;
@@ -167,7 +185,7 @@ impl Game {
             self.board[from][i] = Default::default();
 
             //scan to see if the moved piece is checking the king.
-            if piece.legal_move(&mut self.board, (from, i), (to, j), true) {
+            if piece.legal_move(&mut self.board, (to, j), (to, j), true) {
                 if piece.color_white {
                     self.b_checked = true;
                 } else {
@@ -182,6 +200,26 @@ impl Game {
                     if self.board[i][j].color_white != piece.color_white {
                         self.board[i][j].passant = false;
                     }
+                }
+            }
+
+            if piece.kind == PieceKind::King {
+                println!("it recognizes that moved piece is a king");
+                if self.w_checked || self.b_checked {
+                    for i in 0..8 {
+                        for j in 0..8 {
+                            let location = &mut self.board[i][j];
+                            if location.color_white == piece.color_white && location.locked {
+                                location.locked = false;
+                            }
+                        }
+                    }
+                }
+                println!("we reached to the part where we remove the checking");
+                if piece.color_white {
+                    self.w_checked = false;
+                } else {
+                    self.b_checked = false;
                 }
             }
 
