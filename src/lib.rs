@@ -56,11 +56,11 @@ mod tests {
     #[test]
     fn move_king_clears_lock_and_check() {
         let mut game1 = crate::Game::new_game();
-        let moves = ["E7E6\n", "D2D3\n", "D8H4\n", "E1D2"];
+        let moves = ["E7E6\n", "D2D3\n", "D8H4\n", "E1D2\n"];
         for pmove in moves {
             let _ = game1.player_move(pmove.to_owned());
         }
-        assert!(!game1.board[0][5].locked);
+        assert!(game1.board[1][5].locked == 0);
         assert!(!game1.b_checked);
     }
     #[test]
@@ -74,7 +74,16 @@ mod tests {
         for pmove in moves {
             let _ = game1.player_move(pmove.to_owned());
         }
-        assert!(!game1.board[7][1].locked);
+        assert!(game1.board[7][1].locked == 0);
+    }
+    #[test]
+    fn queen_doesnt_lock_from_a5_bug() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["C7C6\n", "H2H3\n", "D8A5\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.board[1][3].locked != 0);
     }
 }
 
@@ -84,6 +93,7 @@ pub mod macros;
 pub mod pieces;
 use pieces::Piece;
 use pieces::PieceKind;
+use std::collections::HashMap;
 
 pub struct Game {
     pub board: [[Piece; 8]; 8],
@@ -91,6 +101,7 @@ pub struct Game {
     pub turn_white: bool,
     pub w_checked: bool,
     pub b_checked: bool,
+    pub locked_table: HashMap<u8, u8>,
 }
 
 impl Game {
@@ -99,12 +110,14 @@ impl Game {
         let board = Game::construct_board();
         let score = (0, 0);
         let (w_checked, b_checked) = (false, false);
+        let locked_table = HashMap::new();
         Game {
             board,
             score,
             turn_white,
             w_checked,
             b_checked,
+            locked_table,
         }
     }
     fn construct_board() -> [[Piece; 8]; 8] {
@@ -174,8 +187,11 @@ impl Game {
 
         //calculate legal move
         println!("{} is locked: {}", piece.id, piece.locked);
-        if piece.legal_move(&mut self.board, (from, i), (to, j), false)
-            && !(piece.locked && piece.kind != PieceKind::King)
+        let (current_move, _) = piece.legal_move(&mut self.board, (from, i), (to, j), false);
+        if current_move
+            && !(piece.locked > 0
+                && piece.kind != PieceKind::King
+                && self.board[to][j].unique_name != piece.locked)
         {
             //check if the move opens up an opportunity for en passant.
             if ((from == 6 && to == 4) || (from == 1 && to == 3)) && piece.kind == PieceKind::Pawn {
@@ -185,12 +201,17 @@ impl Game {
             self.board[from][i] = Default::default();
 
             //scan to see if the moved piece is checking the king.
-            if piece.legal_move(&mut self.board, (to, j), (to, j), true) {
+            let (check_scan, locked_counter) =
+                piece.legal_move(&mut self.board, (to, j), (to, j), true);
+            if check_scan && locked_counter == 1 {
                 if piece.color_white {
                     self.b_checked = true;
                 } else {
                     self.w_checked = true;
                 }
+            }
+            if locked_counter > 1 {
+                self.locked_table.insert(piece.unique_name, locked_counter);
             }
 
             self.turn_white = !self.turn_white;
@@ -204,14 +225,14 @@ impl Game {
             }
 
             if piece.kind == PieceKind::King {
-                println!("it recognizes that moved piece is a king");
-                if self.w_checked || self.b_checked {
-                    for i in 0..8 {
-                        for j in 0..8 {
-                            let location = &mut self.board[i][j];
-                            if location.color_white == piece.color_white && location.locked {
-                                location.locked = false;
-                            }
+                println!("moved piece is king");
+                for i in 0..8 {
+                    for j in 0..8 {
+                        let location = &mut self.board[i][j];
+                        if location.color_white == piece.color_white && location.locked > 0 {
+                            self.locked_table.remove_entry(&location.locked);
+                            location.locked = 0;
+                            print!("removed lock for {:?}\n", location.kind);
                         }
                     }
                 }

@@ -21,7 +21,7 @@ pub struct Piece {
     pub kind: PieceKind,
     pub color_white: bool,
     pub unique_name: u8,
-    pub locked: bool,
+    pub locked: u8,
 
     //only used for pawns
     pub passant: bool,
@@ -34,7 +34,7 @@ impl Default for Piece {
             kind: PieceKind::None,
             color_white: false,
             unique_name: 0,
-            locked: false,
+            locked: 0,
             passant: false,
         }
     }
@@ -59,7 +59,7 @@ impl Piece {
             _ => (' ', PieceKind::None, false),
         };
         let unique_name = 0;
-        let locked = false;
+        let locked = 0;
         let passant = false;
         Piece {
             id,
@@ -78,7 +78,7 @@ impl Piece {
         start: (usize, usize),
         stop: (usize, usize),
         check_for_check: bool,
-    ) -> bool {
+    ) -> (bool, u8) {
         let mut allowed_board = [[false; 8]; 8];
         let mut locked_board = [[false; 8]; 8];
         //pawn
@@ -222,7 +222,7 @@ impl Piece {
                         if location.kind == PieceKind::King
                             && location.color_white != self.color_white
                         {
-                            return true;
+                            return (true, 1);
                         }
                     } else {
                         println!("{:?} was not checked from {:?}", pmove, stop);
@@ -257,31 +257,35 @@ impl Piece {
                 print!("\n");
             }
         }
-        //confirm the move is in the array of allowed moves
+
         if check_for_check {
             for i in 0..8 {
                 for j in 0..8 {
                     if locked_board[i][j] == true && board[i][j].kind != PieceKind::King {
                         println!("{},{} locked", i, j);
-                        board[i][j].locked = true;
+                        board[i][j].locked = self.unique_name;
                     }
                 }
             }
+            let mut locked_counter = 0;
             for i in 0..8 {
                 for j in 0..6 {
                     if locked_board[i][j] == true {
-                        println!("this is reached, the board contains true and we return true");
-                        return true;
+                        locked_counter += 1;
                     }
                 }
             }
-            return false;
+            if locked_counter != 0 {
+                return (true, locked_counter);
+            } else {
+                return (false, 0);
+            }
         }
 
         if allowed_board[stop.0][stop.1] && !check_for_check {
-            return true;
+            return (true, 0);
         } else {
-            false
+            (false, 0)
         }
     }
 }

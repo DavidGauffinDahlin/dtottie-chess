@@ -309,10 +309,10 @@ macro_rules! scan {
                     }
                 }
                 if block == true && $checkcheck && locked_temp.len() > 0 {
-                    // for places in &locked_temp {
-                    //     locked_board[places.0][places.1] = true;
-                    // }
-                    locked_board[locked_temp[0].0][locked_temp[0].1] = true;
+                    for places in &locked_temp {
+                        locked_board[places.0][places.1] = true;
+                    }
+                    //locked_board[locked_temp[0].0][locked_temp[0].1] = true;
                 }
             }
         } else {
@@ -405,10 +405,10 @@ macro_rules! scan {
                     }
                 }
                 if block == true && $checkcheck && locked_temp.len() > 0 {
-                    // for places in &locked_temp {
-                    //     locked_board[places.0][places.1] = true;
-                    // }
-                    locked_board[locked_temp[0].0][locked_temp[0].1] = true;
+                    for places in &locked_temp {
+                        locked_board[places.0][places.1] = true;
+                    }
+                    //locked_board[locked_temp[0].0][locked_temp[0].1] = true;
                 }
             }
         }
