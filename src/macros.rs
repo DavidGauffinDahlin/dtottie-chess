@@ -7,15 +7,15 @@ macro_rules! king_scan {
             let mut tile_checked = false;
             //kolla så vi inte går out of bounds
             if ((tile.0 < 0 && $position.0 as i8 >= -(tile.0))
-                || (tile.0 > 0 && $position.0 as i8 + tile.0 < 8))
+                || (tile.0 >= 0 && $position.0 as i8 + tile.0 < 8))
                 && ((tile.1 < 0 && $position.1 as i8 >= -(tile.1))
-                    || (tile.1 > 0 && $position.1 as i8 + tile.1 < 8))
+                    || (tile.1 >= 0 && $position.1 as i8 + tile.1 < 8))
             {
+                
                 let location = (
                     ($position.0 as i8 + tile.0) as usize,
                     ($position.1 as i8 + tile.1) as usize,
                 );
-
                 //check if the tile is empty or occupied by an enemy piece
                 if $board[location.0][location.1].kind == PieceKind::None
                     || ($board[location.0][location.1].kind != PieceKind::None
@@ -23,25 +23,23 @@ macro_rules! king_scan {
                             != $board[$position.0][$position.1].color_white)
                 {
                     $allowed_board[location.0][location.1] = true;
-                    println!("{:?}", $allowed_board[6][4]);
                     //down
                     if tile_checked == false {
                         for i in (location.0 + 1)..7 {
-                            println!("{:?}", i);
                             let square = &$board[i][location.1];
                             if square.kind != PieceKind::None {
                                 if square.color_white
                                     == $board[$position.0][$position.1].color_white
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
                                     || square.kind == PieceKind::Rook
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::King && i == 1)
                                 {
                                     $allowed_board[location.0][location.1] = false;
                                     tile_checked = true;
-                                }
+                                }}
                             }
                         }
                     }
@@ -54,14 +52,14 @@ macro_rules! king_scan {
                                     == $board[$position.0][$position.1].color_white
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
                                     || square.kind == PieceKind::Rook
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::King && i == 1)
                                 {
                                     $allowed_board[location.0][location.1] = false;
                                     tile_checked = true;
-                                }
+                                }}
                             }
                         }
                     }
@@ -74,14 +72,14 @@ macro_rules! king_scan {
                                     == $board[$position.0][$position.1].color_white
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
                                     || square.kind == PieceKind::Rook
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::King && i == 1)
                                 {
                                     $allowed_board[location.0][location.1] = false;
                                     tile_checked = true;
-                                }
+                                }}
                             }
                         }
                     }
@@ -94,14 +92,14 @@ macro_rules! king_scan {
                                     == $board[$position.0][$position.1].color_white
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
                                     || square.kind == PieceKind::Rook
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::King && i == 1)
                                 {
                                     $allowed_board[location.0][location.1] = false;
                                     tile_checked = true;
-                                }
+                                }}
                             }
                         }
                     }
@@ -114,15 +112,15 @@ macro_rules! king_scan {
                                     == $board[$position.0][$position.1].color_white
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
-                                    || square.kind == PieceKind::Pawn
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::Pawn && i == 1)
+                                    || (square.kind == PieceKind::King && i == 1)
                                     || square.kind == PieceKind::Bishop
                                 {
                                     $allowed_board[location.0][location.1] = false;
                                     tile_checked = true;
-                                }
+                                }}
                             }
                         }
                     }
@@ -134,15 +132,15 @@ macro_rules! king_scan {
                                     == $board[$position.0][$position.1].color_white
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
-                                    || square.kind == PieceKind::Pawn
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::Pawn && i == 1)
+                                    || (square.kind == PieceKind::King && i == 1)
                                     || square.kind == PieceKind::Bishop
                                 {
                                     $allowed_board[location.0][location.1] = false;
                                     tile_checked = true;
-                                }
+                                }}
                             }
                         }
                     }
@@ -154,15 +152,15 @@ macro_rules! king_scan {
                                     == $board[$position.0][$position.1].color_white
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
-                                    || square.kind == PieceKind::Pawn
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::Pawn && i == 1)
+                                    || (square.kind == PieceKind::King && i == 1)
                                     || square.kind == PieceKind::Bishop
                                 {
                                     $allowed_board[location.0][location.1] = false;
                                     tile_checked = true;
-                                }
+                                }}
                             }
                         }
                     }
@@ -176,12 +174,35 @@ macro_rules! king_scan {
                                     && square.kind != PieceKind::King
                                 {
                                     break;
-                                }
+                                } else {
                                 if square.kind == PieceKind::Queen
-                                    || square.kind == PieceKind::King
+                                    || (square.kind == PieceKind::Pawn && i == 1)
+                                    || (square.kind == PieceKind::King && i == 1)
                                     || square.kind == PieceKind::Bishop
                                 {
                                     $allowed_board[location.0][location.1] = false;
+                                    tile_checked = true;
+                                }}
+                            }
+                        }
+                    }
+                    //check for that damned horse
+                    if tile_checked == false {
+                        let moves = [(2,1),(2,-1),(1,2),(1,-2),(-2,1),(-2,-1),(-1,2),(-1,-2)];
+                        for pmove in moves {
+                            if tile_checked == false {
+                            if ((pmove.0 < 0 && location.0 as i8 >= -(pmove.0))
+                                || (pmove.0 >= 0 && location.0 as i8 + pmove.0 < 8))
+                                && ((pmove.1 < 0 && location.1 as i8 >= -(pmove.1))
+                                || (pmove.1 >= 0 && location.1 as i8 + pmove.1 < 8)) {
+                                    let knightcheck = (
+                                        (location.0 as i8 + pmove.0) as usize,
+                                        (location.1 as i8 + pmove.1) as usize,
+                                    );
+                                    if $board[knightcheck.0][knightcheck.1].kind == PieceKind::Knight && $board[knightcheck.0][knightcheck.1].color_white != $board[$position.0][$position.1].color_white {
+                                        $allowed_board[location.0][location.1] = false;
+                                        tile_checked = true;
+                                    }
                                 }
                             }
                         }
@@ -205,22 +226,24 @@ macro_rules! scan {
                 if $position.0 > 8 {
                     block = true;
                 }
-            } else {
-                if $position.0 < 1 {
+            } /* else {
+                if $position.0 < 0 {
                     block = true;
                 }
-            }
+            } */
         } else {
             if $reverse == 0 {
                 if $position.1 > 8 {
                     block = true;
                 }
-            } else {
-                if $position.1 < 1 {
+            } /* else {
+                if $position.1 < 0 {
                     block = true;
                 }
-            }
+            } */
         }
+        //när vi skannar åt ett håll antar vi att alla rutor med pjäser ska låsas (ej få flyttas då det sätter kungen i schack)
+        //om vi sedan inte hittar någon kung i samma riktning så droppar vi dessa element.
         let mut locked_temp = vec![];
         if $reverse == 0 {
             let iter = match ($horizontal, $diagonal) {
@@ -349,7 +372,7 @@ macro_rules! scan {
                                     if $position.0 >= j && $position.1 + j < 8 {
                                         $allowed_board[$position.0 - j][$position.1 + j] = true;
                                         if $checkcheck {
-                                            locked_temp.push((($position.0 - j), ($position.1 + j)))
+                                            locked_temp.push((($position.0 - j), ($position.1 + j)));
                                         }
                                     }
                                 }
@@ -387,11 +410,11 @@ macro_rules! scan {
                             block = true;
                         }
                     }
-                    if block == false {
+                    if block == false && !$checkcheck {
                         match ($horizontal, $diagonal) {
                             (1, 1) => {
                                 if $position.0 >= j && $position.1 + j < 8 {
-                                    $allowed_board[$position.0 - j][$position.1 + j] = true
+                                    $allowed_board[$position.0 - j][$position.1 + j] = true;
                                 }
                             }
                             (_, 1) => {

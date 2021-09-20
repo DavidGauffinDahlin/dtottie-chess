@@ -1,10 +1,6 @@
 #[cfg(test)]
 mod tests {
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-    #[test]
     fn illegal_move() {
         let mut game1 = crate::Game::new_game();
         assert!(game1.player_move("D8B8\n".to_owned()).is_err());
@@ -65,7 +61,11 @@ mod tests {
     }
     #[test]
     fn takedown_clears_lock_and_check() {
-        panic!();
+        let mut game1 = crate::Game::new_game();
+        let moves = ["C7C6\n", "D2D3\n", "D8B6\n", "C1D2\n","B6A5\n","D2A5\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
     }
     #[test]
     fn threat_doesnt_lock_all_pieces_bug() {
@@ -85,7 +85,99 @@ mod tests {
         }
         assert!(game1.board[1][3].locked != 0);
     }
+    #[test]
+    fn queen_cant_move_up_diagonally_from_a5_bug() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["C7C6\n", "H2H3\n", "D8A5\n", "H3H4\n","A5B4\n"];
+        for pmove in moves {
+            assert!(!game1.player_move(pmove.to_owned()).is_err());
+        }
+    }
+    #[test]
+    fn move_aggressive_piece_clears_lock() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["C7C6\n", "H2H3\n", "D8A5\n", "H3H4\n","A5D8\n", "D2D3\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.board[2][3].locked == 0);
+    }
+    #[test]
+    fn can_move_locked_piece_if_several_pieces_are_locked() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "G2G3\n", "D8H4\n", "G3G4\n"];
+        for pmove in moves {
+            assert!(game1.player_move(pmove.to_owned()).is_ok());
+        }
+    }
+    #[test]
+    fn pawn_cant_move_through_piece() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "A2A3\n", "D8F6\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("F7F5\n".to_owned()).is_err());
+    }
+    #[test]
+    fn pawn_can_check_king() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["D7D5\n", "E2E4\n", "A7A6\n", "E1E2\n","A6A5\n", "E2E3\n", "D5D4\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.b_checked);
+    }
+    #[test]
+    fn king_cant_move_forward_glitch() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["D7D5\n", "E2E4\n", "A7A6\n", "E1E2\n"];
+        for pmove in moves {
+            assert!(game1.player_move(pmove.to_owned()).is_ok());
+        }
+
+    }
+    #[test]
+    fn pawn_can_threaten_tile() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["D7D5\n", "E2E4\n", "D5D4\n", "E1E2\n","A7A6\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("E2E3\n".to_owned()).is_err());
+    }
+    #[test]
+    fn king_checks_for_threatening_knight() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["B8C6\n", "E2E3\n", "C6D4\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("E1E2\n".to_owned()).is_err());
+    }
+    #[test]
+    fn king_can_threaten_tile() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["D7D6\n", "D2D3\n", "E8D7\n","E1D2\n", "D7E6\n", "D2E3\n" , "E6E5\n"];
+        for pmove in moves {
+            assert!(game1.player_move(pmove.to_owned()).is_ok());
+        }
+        assert!(game1.player_move("E3E4\n".to_owned()).is_err());
+    }
 }
+
+//TO IMPLEMENT (remove when there is a corresponding test)
+//king scan at the end of every move? [lib]
+//king can threaten tiles [kingscan]
+//game can end [lib]
+//piece can eliminate king's threatener so game doesn't end [lib]
+//test how well it works when piece is locked by several pieces
+//king can tower with rook [pieces.rs]
+//chess 50 move rule
+//chess 3 move rule
+//points for eliminated pieces
+
+
 
 #[macro_use]
 pub mod macros;
@@ -175,9 +267,61 @@ impl Game {
                 return Err("Internal Error");
             }
         };
-
+        //iterate digits from input
         let i = table.iter().position(|&s| s == &input[0..1]).unwrap();
         let j = table.iter().position(|&s| s == &input[2..3]).unwrap();
+
+        //iterate board to update threat zone
+        for x in 0..8 {
+            for z in 0..8 {
+                let checkpiece = self.board[x][z].clone();
+                let threatposition = (x,z);
+                if self.locked_table.contains_key(&checkpiece.unique_name) {
+                    self.locked_table.remove(&checkpiece.unique_name);
+                    for q in 0..8 {
+                        for w in 0..8 {
+                            let lockedpiece = &self.board[q][w];
+                            if lockedpiece.locked == checkpiece.unique_name {
+                                self.board[q][w].locked = 0
+                            }
+                        }
+                    }
+                    println!("checkpoint 0");
+                    //let (check_scan,locked_counter) = (false,0);
+                    let (check_scan, locked_counter) = checkpiece.legal_move(&mut self.board, threatposition, threatposition, true);
+
+                    /* for p in 0..8 {
+                        for q in 0..8 {
+                            if self.board[p][q].locked > 0 {
+                                println!("following piece is locked: {:?}", self.board[p][q].kind);
+                            }
+                        }
+                    } */
+
+                    //if the locking piece is the one currently being moved, we scan from where it is being moved instead.
+                    //Although this happens later in the code anyway.
+                    /* if checkpiece == self.board[from][i] {
+                    check_scan = checkpiece.legal_move(&mut self.board, (to,j), (to,j), true).0;
+                    locked_counter = checkpiece.legal_move(&mut self.board, (to,j), (to,j), true).1;
+                } */
+                    println!("checkscan = {}, locked_counter= {}",check_scan, locked_counter);
+                    if check_scan && locked_counter == 1 {
+                        println!("checkpoint 1");
+                        if checkpiece.color_white {
+                            self.b_checked = true;
+                        } else {
+                            self.w_checked = true;
+                        }
+                    }
+                    if locked_counter > 1 {
+                        self.locked_table.insert(checkpiece.unique_name, locked_counter);
+                    }
+                }
+
+            }
+        }
+
+
 
         //check piece, confirm that its this piece's turn
         let piece = &mut self.board[from][i].clone();
@@ -186,12 +330,19 @@ impl Game {
         }
 
         //calculate legal move
-        println!("{} is locked: {}", piece.id, piece.locked);
         let (current_move, _) = piece.legal_move(&mut self.board, (from, i), (to, j), false);
+        println!("current_move is {:?}", current_move);
+        
+        let locked_lookup = match self.locked_table.get_key_value(&piece.locked) {
+            Some(n) => n.1.to_owned(),
+            None => 0,
+        };
+        
+        println!("lockedlookup is {}", locked_lookup);
         if current_move
-            && !(piece.locked > 0
-                && piece.kind != PieceKind::King
-                && self.board[to][j].unique_name != piece.locked)
+            && (!((piece.locked > 0
+                && piece.kind != PieceKind::King)
+                && self.board[to][j].unique_name != piece.locked) || locked_lookup > 2)
         {
             //check if the move opens up an opportunity for en passant.
             if ((from == 6 && to == 4) || (from == 1 && to == 3)) && piece.kind == PieceKind::Pawn {

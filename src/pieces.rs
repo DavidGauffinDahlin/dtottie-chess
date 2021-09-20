@@ -15,7 +15,7 @@ pub enum PieceKind {
 //     }
 // }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Piece {
     pub id: char,
     pub kind: PieceKind,
@@ -85,10 +85,11 @@ impl Piece {
         if self.kind == PieceKind::Pawn {
             //since pawns are directional we need to write a black and a white verison of
             //these calculations
+            if !check_for_check {
             if self.color_white {
                 if start.0 == 6 {
                     //jump two steps if on starting position
-                    if board[start.0 - 2][start.1].kind == PieceKind::None {
+                    if board[start.0 - 2][start.1].kind == PieceKind::None && board[start.0 - 1][start.1].kind == PieceKind::None {
                         allowed_board[start.0 - 2][start.1] = true;
                     }
                 }
@@ -101,7 +102,7 @@ impl Piece {
                     let diagonal = &board[start.0 - 1][start.1 + 1];
                     if (diagonal.kind != PieceKind::None
                         && diagonal.color_white != self.color_white)
-                        || board[start.0][start.1 + 1].passant == true
+                        || (board[start.0][start.1 + 1].passant == true && board[start.0 - 1][start.1].kind == PieceKind::None)
                     {
                         allowed_board[start.0 - 1][start.1 + 1] = true;
                     }
@@ -110,7 +111,7 @@ impl Piece {
                     let diagonal = &board[start.0 - 1][start.1 - 1];
                     if (diagonal.kind != PieceKind::None
                         && diagonal.color_white != self.color_white)
-                        || board[start.0][start.1 - 1].passant == true
+                        || (board[start.0][start.1 - 1].passant == true && board[start.0 - 1][start.1].kind == PieceKind::None)
                     {
                         allowed_board[start.0 - 1][start.1 - 1] = true;
                     }
@@ -118,7 +119,7 @@ impl Piece {
             } else {
                 if start.0 == 1 {
                     //jump two steps if on starting position
-                    if board[start.0 + 2][start.1].kind == PieceKind::None {
+                    if board[start.0 + 2][start.1].kind == PieceKind::None && board[start.0 + 1][start.1].kind == PieceKind::None {
                         allowed_board[start.0 + 2][start.1] = true;
                     }
                 }
@@ -131,7 +132,7 @@ impl Piece {
                     let diagonal = &board[start.0 + 1][start.1 + 1];
                     if (diagonal.kind != PieceKind::None
                         && diagonal.color_white != self.color_white)
-                        || board[start.0][start.1 + 1].passant == true
+                        || (board[start.0][start.1 + 1].passant == true && board[start.0 + 1][start.1].kind == PieceKind::None)
                     {
                         allowed_board[start.0 + 1][start.1 + 1] = true;
                     }
@@ -140,12 +141,35 @@ impl Piece {
                     let diagonal = &board[start.0 + 1][start.1 - 1];
                     if (diagonal.kind != PieceKind::None
                         && diagonal.color_white != self.color_white)
-                        || board[start.0][start.1 - 1].passant == true
+                        || (board[start.0][start.1 - 1].passant == true && board[start.0 + 1][start.1].kind == PieceKind::None)
                     {
                         allowed_board[start.0 + 1][start.1 - 1] = true;
                     }
                 }
             }
+        } else {
+            if self.color_white {
+                if start.0 >= 1 {
+                if start.1 + 1 < 8 {
+                if &board[start.0 - 1][start.1 + 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
+                    return (true,1)
+                }}
+                if start.1 >= 1 {
+                if &board[start.0 - 1][start.1 - 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
+                    return (true,1)
+                }}}
+            } else {
+                if start.0 + 1 < 8 {
+                    if start.1 + 1 < 8 {
+                    if &board[start.0 + 1][start.1 + 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
+                        return (true,1)
+                    }}
+                    if start.1 >= 1 {
+                    if &board[start.0 + 1][start.1 - 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
+                        return (true,1)
+                    }}}
+            }
+        }
         }
 
         //Pieces travelling straight will use these calculations
@@ -209,9 +233,9 @@ impl Piece {
                 for pmove in moves {
                     println!("im reached, {:?}", pmove);
                     if ((pmove.0 < 0 && stop.0 as i8 >= -(pmove.0))
-                        || (pmove.0 > 0 && pmove.0 as usize + stop.0 < 7))
+                        || (pmove.0 >= 0 && pmove.0 as usize + stop.0 < 7))
                         && ((pmove.1 < 0 && stop.1 as i8 >= -(pmove.1))
-                            || (pmove.1 > 0 && pmove.1 as usize + stop.1 < 7))
+                            || (pmove.1 >= 0 && pmove.1 as usize + stop.1 < 7))
                     {
                         println!("{:?}", stop.1 as i8 + pmove.1);
                         let coordinate = (stop.0 as i8 + pmove.0, stop.1 as i8 + pmove.1);
@@ -233,6 +257,7 @@ impl Piece {
 
         //King
         if self.kind == PieceKind::King {
+            println!("reconized as king");
             //calculate legal move from the target square?
             let adjacent_tiles = [
                 (1, 0),
@@ -261,7 +286,7 @@ impl Piece {
         if check_for_check {
             for i in 0..8 {
                 for j in 0..8 {
-                    if locked_board[i][j] == true && board[i][j].kind != PieceKind::King {
+                    if locked_board[i][j] == true {
                         println!("{},{} locked", i, j);
                         board[i][j].locked = self.unique_name;
                     }
@@ -269,7 +294,7 @@ impl Piece {
             }
             let mut locked_counter = 0;
             for i in 0..8 {
-                for j in 0..6 {
+                for j in 0..8 {
                     if locked_board[i][j] == true {
                         locked_counter += 1;
                     }
