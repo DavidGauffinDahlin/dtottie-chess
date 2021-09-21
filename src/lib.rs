@@ -62,7 +62,7 @@ mod tests {
     #[test]
     fn takedown_clears_lock_and_check() {
         let mut game1 = crate::Game::new_game();
-        let moves = ["C7C6\n", "D2D3\n", "D8B6\n", "C1D2\n","B6A5\n","D2A5\n"];
+        let moves = ["C7C6\n", "D2D3\n", "D8B6\n", "C1D2\n", "B6A5\n", "D2A5\n"];
         for pmove in moves {
             let _ = game1.player_move(pmove.to_owned());
         }
@@ -88,7 +88,7 @@ mod tests {
     #[test]
     fn queen_cant_move_up_diagonally_from_a5_bug() {
         let mut game1 = crate::Game::new_game();
-        let moves = ["C7C6\n", "H2H3\n", "D8A5\n", "H3H4\n","A5B4\n"];
+        let moves = ["C7C6\n", "H2H3\n", "D8A5\n", "H3H4\n", "A5B4\n"];
         for pmove in moves {
             assert!(!game1.player_move(pmove.to_owned()).is_err());
         }
@@ -96,7 +96,7 @@ mod tests {
     #[test]
     fn move_aggressive_piece_clears_lock() {
         let mut game1 = crate::Game::new_game();
-        let moves = ["C7C6\n", "H2H3\n", "D8A5\n", "H3H4\n","A5D8\n", "D2D3\n"];
+        let moves = ["C7C6\n", "H2H3\n", "D8A5\n", "H3H4\n", "A5D8\n", "D2D3\n"];
         for pmove in moves {
             let _ = game1.player_move(pmove.to_owned());
         }
@@ -122,7 +122,9 @@ mod tests {
     #[test]
     fn pawn_can_check_king() {
         let mut game1 = crate::Game::new_game();
-        let moves = ["D7D5\n", "E2E4\n", "A7A6\n", "E1E2\n","A6A5\n", "E2E3\n", "D5D4\n"];
+        let moves = [
+            "D7D5\n", "E2E4\n", "A7A6\n", "E1E2\n", "A6A5\n", "E2E3\n", "D5D4\n",
+        ];
         for pmove in moves {
             let _ = game1.player_move(pmove.to_owned());
         }
@@ -135,12 +137,11 @@ mod tests {
         for pmove in moves {
             assert!(game1.player_move(pmove.to_owned()).is_ok());
         }
-
     }
     #[test]
     fn pawn_can_threaten_tile() {
         let mut game1 = crate::Game::new_game();
-        let moves = ["D7D5\n", "E2E4\n", "D5D4\n", "E1E2\n","A7A6\n"];
+        let moves = ["D7D5\n", "E2E4\n", "D5D4\n", "E1E2\n", "A7A6\n"];
         for pmove in moves {
             let _ = game1.player_move(pmove.to_owned());
         }
@@ -158,26 +159,96 @@ mod tests {
     #[test]
     fn king_can_threaten_tile() {
         let mut game1 = crate::Game::new_game();
-        let moves = ["D7D6\n", "D2D3\n", "E8D7\n","E1D2\n", "D7E6\n", "D2E3\n" , "E6E5\n"];
+        let moves = [
+            "D7D6\n", "D2D3\n", "E8D7\n", "E1D2\n", "D7E6\n", "D2E3\n", "E6E5\n",
+        ];
         for pmove in moves {
             assert!(game1.player_move(pmove.to_owned()).is_ok());
         }
         assert!(game1.player_move("E3E4\n".to_owned()).is_err());
     }
+    #[test]
+    fn check_mate() {
+        let mut game1 = crate::Game::new_game();
+        let moves = [
+            "D7D6\n", "E2E4\n", "D8D7\n", "E1E2\n", "D7C6\n", "D1E1\n", "C8D7\n", "B1C3\n",
+            "D7C8\n", "B2B3\n", "C8D7\n", "C1B2\n", "D7C8\n", "A1D1\n", "C8D7\n", "C3B1\n",
+            "C6E4\n",
+        ];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.check_mate);
+    }
+    #[test]
+    fn not_check_mate_if_can_save() {
+        let mut game1 = crate::Game::new_game();
+        let moves = [
+            "D7D6\n", "E2E4\n", "D8D7\n", "E1E2\n", "D7C6\n", "D1E1\n", "C8D7\n", "B1C3\n",
+            "D7C8\n", "B2B3\n", "C8D7\n", "C1B2\n", "D7C8\n", "A1D1\n", "C6E4\n",
+        ];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(!game1.check_mate);
+    }
+    #[test]
+    fn queen_move_through_king_bug() {
+        let mut game1 = crate::Game::new_game();
+        let moves = [
+            "D7D6\n", "E2E4\n", "D8D7\n", "E1E2\n", "D7C6\n", "D1E1\n", "C8D7\n", "B1C3\n",
+            "D7C8\n", "B2B3\n", "C8D7\n", "C1B2\n", "D7C8\n", "A1D1\n", "C6E4\n",
+        ];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("E1E4\n".to_owned()).is_err());
+    }
+    #[test]
+    fn can_save_check_by_blocking() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "F2F3\n", "D8H4\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("G2G3\n".to_owned()).is_ok());
+    }
+    #[test]
+    fn cant_move_irrelevant_piece_during_check() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "F2F3\n", "D8H4\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("D2D4\n".to_owned()).is_err());
+    }
+    #[test]
+    fn can_move_if_still_blocks() {
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "A2A3\n", "D8F6\n", "A3A4\n", "F6E5\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("E2E3\n".to_owned()).is_ok());
+    }
+    #[test]
+    fn king_can_castle_right() {
+        panic!()
+    }
+    #[test]
+    fn king_can_castle_left() {
+        panic!()
+    }
+    #[test]
+    fn fifty_move_rule() {
+        panic!()
+    }
 }
 
 //TO IMPLEMENT (remove when there is a corresponding test)
-//king scan at the end of every move? [lib]
-//king can threaten tiles [kingscan]
-//game can end [lib]
-//piece can eliminate king's threatener so game doesn't end [lib]
 //test how well it works when piece is locked by several pieces
-//king can tower with rook [pieces.rs]
-//chess 50 move rule
-//chess 3 move rule
+//pawn promotion
 //points for eliminated pieces
-
-
 
 #[macro_use]
 pub mod macros;
@@ -186,6 +257,7 @@ pub mod pieces;
 use pieces::Piece;
 use pieces::PieceKind;
 use std::collections::HashMap;
+use std::collections::VecDeque;
 
 pub struct Game {
     pub board: [[Piece; 8]; 8],
@@ -194,6 +266,10 @@ pub struct Game {
     pub w_checked: bool,
     pub b_checked: bool,
     pub locked_table: HashMap<u8, u8>,
+    pub check_mate: bool,
+    pub tie: bool,
+    pub fifty_moves: VecDeque<Piece>,
+    pub dead_pieces: VecDeque<Piece>,
 }
 
 impl Game {
@@ -203,6 +279,14 @@ impl Game {
         let score = (0, 0);
         let (w_checked, b_checked) = (false, false);
         let locked_table = HashMap::new();
+        let check_mate = false;
+        let mut fifty_moves: VecDeque<Piece> = VecDeque::with_capacity(50);
+        for _ in 0..50 {
+            fifty_moves.push_front(Piece::new_piece("bp"));
+        }
+        let dead_pieces: VecDeque<Piece> = VecDeque::new();
+        let tie = false;
+
         Game {
             board,
             score,
@@ -210,6 +294,10 @@ impl Game {
             w_checked,
             b_checked,
             locked_table,
+            check_mate,
+            tie,
+            fifty_moves,
+            dead_pieces,
         }
     }
     fn construct_board() -> [[Piece; 8]; 8] {
@@ -236,168 +324,232 @@ impl Game {
         board
     }
 
-    pub fn player_move(&mut self, input: String) -> Result<bool, &str> {
-        //verifiera user input
-        if input.len() < 5 {
-            return Err("Invalid input");
-        }
-
-        //Convertera user input till index
-        let table = ["A", "B", "C", "D", "E", "F", "G", "H"];
-        if !table.contains(&&input[0..1]) || !table.contains(&&input[2..3]) {
-            return Err("Invalid Input");
-        }
-
-        //parse the digits and convert them to usize
-        let parsed = &input[1..2];
-        let from: usize = match parsed.parse::<usize>() {
-            Ok(value) => value.to_owned() - 1,
-            Err(error) => {
-                println!("{}", error);
-                return Err("internal error");
+    pub fn player_move(&mut self, input: String) -> Result<bool, String> {
+        if self.check_mate {
+            Ok(self.check_mate)
+        } else {
+            //verifiera user input
+            if input.len() < 5 {
+                return Err("Invalid input".to_owned());
             }
-        };
-        //let from = from.to_owned();
-        //let from = from - 1;
-        let parsed = &input[3..4];
-        let to: usize = match parsed.parse::<usize>() {
-            Ok(value) => value.to_owned() - 1,
-            Err(error) => {
-                println!("{}", error);
-                return Err("Internal Error");
+
+            //Convertera user input till index
+            let table = ["A", "B", "C", "D", "E", "F", "G", "H"];
+            if !table.contains(&&input[0..1]) || !table.contains(&&input[2..3]) {
+                return Err("Invalid Input".to_owned());
             }
-        };
-        //iterate digits from input
-        let i = table.iter().position(|&s| s == &input[0..1]).unwrap();
-        let j = table.iter().position(|&s| s == &input[2..3]).unwrap();
 
-        //iterate board to update threat zone
-        for x in 0..8 {
-            for z in 0..8 {
-                let checkpiece = self.board[x][z].clone();
-                let threatposition = (x,z);
-                if self.locked_table.contains_key(&checkpiece.unique_name) {
-                    self.locked_table.remove(&checkpiece.unique_name);
-                    for q in 0..8 {
-                        for w in 0..8 {
-                            let lockedpiece = &self.board[q][w];
-                            if lockedpiece.locked == checkpiece.unique_name {
-                                self.board[q][w].locked = 0
-                            }
-                        }
-                    }
-                    println!("checkpoint 0");
-                    //let (check_scan,locked_counter) = (false,0);
-                    let (check_scan, locked_counter) = checkpiece.legal_move(&mut self.board, threatposition, threatposition, true);
+            //parse the digits and convert them to usize
+            let parsed = &input[1..2];
+            let from: usize = match parsed.parse::<usize>() {
+                Ok(value) => value.to_owned() - 1,
+                Err(error) => {
+                    return Err(error.to_string());
+                }
+            };
+            //let from = from.to_owned();
+            //let from = from - 1;
+            let parsed = &input[3..4];
+            let to: usize = match parsed.parse::<usize>() {
+                Ok(value) => value.to_owned() - 1,
+                Err(error) => {
+                    println!("{}", error);
+                    return Err("Internal Error".to_owned());
+                }
+            };
+            //iterate digits from input
+            let i = table.iter().position(|&s| s == &input[0..1]).unwrap();
+            let j = table.iter().position(|&s| s == &input[2..3]).unwrap();
 
-                    /* for p in 0..8 {
+            //iterate board to update threat zone
+            for x in 0..8 {
+                for z in 0..8 {
+                    let checkpiece = self.board[x][z].clone();
+                    let threatposition = (x, z);
+                    if self.locked_table.contains_key(&checkpiece.unique_name) {
+                        self.locked_table.remove(&checkpiece.unique_name);
                         for q in 0..8 {
-                            if self.board[p][q].locked > 0 {
-                                println!("following piece is locked: {:?}", self.board[p][q].kind);
+                            for w in 0..8 {
+                                let lockedpiece = &self.board[q][w];
+                                if lockedpiece.locked == checkpiece.unique_name {
+                                    self.board[q][w].locked = 0
+                                }
                             }
                         }
-                    } */
 
-                    //if the locking piece is the one currently being moved, we scan from where it is being moved instead.
-                    //Although this happens later in the code anyway.
-                    /* if checkpiece == self.board[from][i] {
-                    check_scan = checkpiece.legal_move(&mut self.board, (to,j), (to,j), true).0;
-                    locked_counter = checkpiece.legal_move(&mut self.board, (to,j), (to,j), true).1;
-                } */
-                    println!("checkscan = {}, locked_counter= {}",check_scan, locked_counter);
-                    if check_scan && locked_counter == 1 {
-                        println!("checkpoint 1");
-                        if checkpiece.color_white {
-                            self.b_checked = true;
-                        } else {
-                            self.w_checked = true;
+                        let (check_scan, locked_counter) = checkpiece.legal_move(
+                            &mut self.board,
+                            threatposition,
+                            threatposition,
+                            true,
+                        );
+
+                        if check_scan && locked_counter == 1 {
+                            if checkpiece.color_white {
+                                self.b_checked = true;
+                            } else {
+                                self.w_checked = true;
+                            }
+                        }
+                        if locked_counter > 1 {
+                            self.locked_table
+                                .insert(checkpiece.unique_name, locked_counter);
                         }
                     }
-                    if locked_counter > 1 {
-                        self.locked_table.insert(checkpiece.unique_name, locked_counter);
-                    }
-                }
-
-            }
-        }
-
-
-
-        //check piece, confirm that its this piece's turn
-        let piece = &mut self.board[from][i].clone();
-        if piece.id == ' ' || piece.color_white != self.turn_white {
-            return Err("Illegal move: Wrong player turn");
-        }
-
-        //calculate legal move
-        let (current_move, _) = piece.legal_move(&mut self.board, (from, i), (to, j), false);
-        println!("current_move is {:?}", current_move);
-        
-        let locked_lookup = match self.locked_table.get_key_value(&piece.locked) {
-            Some(n) => n.1.to_owned(),
-            None => 0,
-        };
-        
-        println!("lockedlookup is {}", locked_lookup);
-        if current_move
-            && (!((piece.locked > 0
-                && piece.kind != PieceKind::King)
-                && self.board[to][j].unique_name != piece.locked) || locked_lookup > 2)
-        {
-            //check if the move opens up an opportunity for en passant.
-            if ((from == 6 && to == 4) || (from == 1 && to == 3)) && piece.kind == PieceKind::Pawn {
-                piece.passant = true;
-            }
-            self.board[to][j] = piece.clone();
-            self.board[from][i] = Default::default();
-
-            //scan to see if the moved piece is checking the king.
-            let (check_scan, locked_counter) =
-                piece.legal_move(&mut self.board, (to, j), (to, j), true);
-            if check_scan && locked_counter == 1 {
-                if piece.color_white {
-                    self.b_checked = true;
-                } else {
-                    self.w_checked = true;
                 }
             }
-            if locked_counter > 1 {
-                self.locked_table.insert(piece.unique_name, locked_counter);
+
+            //check piece, confirm that its this piece's turn
+            let piece = &mut self.board[from][i].clone();
+            if piece.id == ' ' || piece.color_white != self.turn_white {
+                return Err("Illegal move: Wrong player turn".to_owned());
             }
 
-            self.turn_white = !self.turn_white;
-            //remove passants of the opposite team
-            for i in 0..8 {
-                for j in 0..8 {
-                    if self.board[i][j].color_white != piece.color_white {
-                        self.board[i][j].passant = false;
+            //calculate legal move
+            let (current_move, _) = piece.legal_move(&mut self.board, (from, i), (to, j), false);
+
+            let locked_lookup = match self.locked_table.get_key_value(&piece.locked) {
+                Some(n) => n.1.to_owned(),
+                None => 0,
+            };
+            //if the king is checked we need to verify that the move stops the check
+            let mut move_clears_check = false;
+            if self.b_checked || self.w_checked || piece.locked > 0 {
+                let mut temp_board = self.board.clone();
+                temp_board[to][j] = piece.clone();
+                temp_board[from][i] = Default::default();
+                for t in 0..8 {
+                    for y in 0..8 {
+                        if temp_board[t][y].kind == PieceKind::King
+                            && temp_board[t][y].color_white == piece.color_white
+                        {
+                            let mut board_check = [[false; 8]; 8];
+                            board_check = king_scan!((t, y), temp_board, board_check, [(0, 0)]);
+                            if board_check[t][y] == true {
+                                move_clears_check = true;
+                            }
+                        }
                     }
                 }
             }
 
-            if piece.kind == PieceKind::King {
-                println!("moved piece is king");
+            if current_move
+                && (!((piece.locked > 0 && piece.kind != PieceKind::King)
+                    && self.board[to][j].unique_name != piece.locked)
+                    || locked_lookup > 2
+                    || move_clears_check)
+                && ((!self.b_checked && !self.w_checked)
+                    || ((self.b_checked || self.w_checked) && move_clears_check))
+            {
+                //check if the move opens up an opportunity for en passant.
+                if ((from == 6 && to == 4) || (from == 1 && to == 3))
+                    && piece.kind == PieceKind::Pawn
+                {
+                    piece.passant = true;
+                }
+                self.board[to][j] = piece.clone();
+                self.board[from][i] = Default::default();
+
+                //scan to see if the moved piece is checking the king.
+                let (check_scan, locked_counter) =
+                    piece.legal_move(&mut self.board, (to, j), (to, j), true);
+                if check_scan && locked_counter == 1 {
+                    if piece.color_white {
+                        self.b_checked = true;
+                    } else {
+                        self.w_checked = true;
+                    }
+                }
+                if locked_counter > 1 {
+                    self.locked_table.insert(piece.unique_name, locked_counter);
+                }
+
+                self.turn_white = !self.turn_white;
+                //remove passants of the opposite team
                 for i in 0..8 {
                     for j in 0..8 {
-                        let location = &mut self.board[i][j];
-                        if location.color_white == piece.color_white && location.locked > 0 {
-                            self.locked_table.remove_entry(&location.locked);
-                            location.locked = 0;
-                            print!("removed lock for {:?}\n", location.kind);
+                        if self.board[i][j].color_white != piece.color_white {
+                            self.board[i][j].passant = false;
                         }
                     }
                 }
-                println!("we reached to the part where we remove the checking");
-                if piece.color_white {
-                    self.w_checked = false;
-                } else {
-                    self.b_checked = false;
-                }
-            }
 
-            Ok(true)
-        } else {
-            return Err("Illegal move");
+                if piece.kind == PieceKind::King {
+                    for i in 0..8 {
+                        for j in 0..8 {
+                            let location = &mut self.board[i][j];
+                            if location.color_white == piece.color_white && location.locked > 0 {
+                                self.locked_table.remove_entry(&location.locked);
+                                location.locked = 0;
+                            }
+                        }
+                    }
+
+                    if piece.color_white {
+                        self.w_checked = false;
+                    } else {
+                        self.b_checked = false;
+                    }
+                }
+                for i in 0..8 {
+                    for j in 0..8 {
+                        let location = &mut self.board[i][j].clone();
+                        if location.kind == PieceKind::King {
+                            let checkmate = location.check_mate(&self.board, (i, j));
+                            if checkmate == true {
+                                if (location.color_white && self.w_checked)
+                                    || (!location.color_white && self.b_checked)
+                                {
+                                    let mut notsafe = true;
+                                    for p in 0..8 {
+                                        for e in 0..8 {
+                                            if self.board[p][e].color_white == location.color_white
+                                                && self.board[p][e].kind != PieceKind::None
+                                            {
+                                                for q in 0..8 {
+                                                    for w in 0..8 {
+                                                        let mut temp_board = self.board.clone();
+                                                        if self.board[p][e]
+                                                            .legal_move(
+                                                                &mut temp_board,
+                                                                (p, e),
+                                                                (q, w),
+                                                                false,
+                                                            )
+                                                            .0
+                                                        {
+                                                            temp_board[q][w] =
+                                                                temp_board[p][e].clone();
+                                                            temp_board[p][e] = Default::default();
+                                                        }
+                                                        let mut board_check = [[false; 8]; 8];
+                                                        board_check = king_scan!(
+                                                            (i, j),
+                                                            temp_board,
+                                                            board_check,
+                                                            [(0, 0)]
+                                                        );
+                                                        if board_check[i][j] == true {
+                                                            notsafe = false;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if notsafe == true {
+                                        self.check_mate = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Ok(true)
+            } else {
+                return Err("Illegal move".to_owned());
+            }
         }
     }
 

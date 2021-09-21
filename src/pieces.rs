@@ -72,6 +72,34 @@ impl Piece {
     }
 
     //the function where legal moves for all piece types is calculated.
+    pub fn check_mate(&self, board: &[[Piece; 8]; 8], position: (usize, usize)) -> bool {
+        if self.kind == PieceKind::King {
+            let mut allowed_board = [[false; 8]; 8];
+            let adjacent_tiles = [
+                (1, 0),
+                (1, 1),
+                (0, 1),
+                (-1, 1),
+                (-1, 0),
+                (-1, -1),
+                (0, -1),
+                (1, -1),
+            ];
+            allowed_board = king_scan!(position, board, allowed_board, adjacent_tiles);
+            let mut true_count = 0;
+            for i in 0..8 {
+                for j in 0..8 {
+                    if allowed_board[i][j] == true {
+                        true_count += 1;
+                    }
+                }
+            }
+            if true_count == 0 {
+                return true;
+            }
+        }
+        false
+    }
     pub fn legal_move(
         &self,
         board: &mut [[Piece; 8]; 8],
@@ -86,90 +114,112 @@ impl Piece {
             //since pawns are directional we need to write a black and a white verison of
             //these calculations
             if !check_for_check {
-            if self.color_white {
-                if start.0 == 6 {
-                    //jump two steps if on starting position
-                    if board[start.0 - 2][start.1].kind == PieceKind::None && board[start.0 - 1][start.1].kind == PieceKind::None {
-                        allowed_board[start.0 - 2][start.1] = true;
+                if self.color_white {
+                    if start.0 == 6 {
+                        //jump two steps if on starting position
+                        if board[start.0 - 2][start.1].kind == PieceKind::None
+                            && board[start.0 - 1][start.1].kind == PieceKind::None
+                        {
+                            allowed_board[start.0 - 2][start.1] = true;
+                        }
                     }
-                }
-                //jump 1 step forward
-                if board[start.0 - 1][start.1].kind == PieceKind::None {
-                    allowed_board[start.0 - 1][start.1] = true;
-                }
-                //eliminate forward diagonally, and potentially allow for a passant
-                if start.1 < 7 {
-                    let diagonal = &board[start.0 - 1][start.1 + 1];
-                    if (diagonal.kind != PieceKind::None
-                        && diagonal.color_white != self.color_white)
-                        || (board[start.0][start.1 + 1].passant == true && board[start.0 - 1][start.1].kind == PieceKind::None)
-                    {
-                        allowed_board[start.0 - 1][start.1 + 1] = true;
+                    //jump 1 step forward
+                    if board[start.0 - 1][start.1].kind == PieceKind::None {
+                        allowed_board[start.0 - 1][start.1] = true;
                     }
-                }
-                if start.1 > 0 {
-                    let diagonal = &board[start.0 - 1][start.1 - 1];
-                    if (diagonal.kind != PieceKind::None
-                        && diagonal.color_white != self.color_white)
-                        || (board[start.0][start.1 - 1].passant == true && board[start.0 - 1][start.1].kind == PieceKind::None)
-                    {
-                        allowed_board[start.0 - 1][start.1 - 1] = true;
+                    //eliminate forward diagonally, and potentially allow for a passant
+                    if start.1 < 7 {
+                        let diagonal = &board[start.0 - 1][start.1 + 1];
+                        if (diagonal.kind != PieceKind::None
+                            && diagonal.color_white != self.color_white)
+                            || (board[start.0][start.1 + 1].passant == true
+                                && board[start.0 - 1][start.1].kind == PieceKind::None)
+                        {
+                            allowed_board[start.0 - 1][start.1 + 1] = true;
+                        }
+                    }
+                    if start.1 > 0 {
+                        let diagonal = &board[start.0 - 1][start.1 - 1];
+                        if (diagonal.kind != PieceKind::None
+                            && diagonal.color_white != self.color_white)
+                            || (board[start.0][start.1 - 1].passant == true
+                                && board[start.0 - 1][start.1].kind == PieceKind::None)
+                        {
+                            allowed_board[start.0 - 1][start.1 - 1] = true;
+                        }
+                    }
+                } else {
+                    if start.0 == 1 {
+                        //jump two steps if on starting position
+                        if board[start.0 + 2][start.1].kind == PieceKind::None
+                            && board[start.0 + 1][start.1].kind == PieceKind::None
+                        {
+                            allowed_board[start.0 + 2][start.1] = true;
+                        }
+                    }
+                    //jump 1 step forward
+                    if board[start.0 + 1][start.1].kind == PieceKind::None {
+                        allowed_board[start.0 + 1][start.1] = true;
+                    }
+                    //eliminate forward diagonally, and potentionally allow for a passant
+                    if start.1 < 7 {
+                        let diagonal = &board[start.0 + 1][start.1 + 1];
+                        if (diagonal.kind != PieceKind::None
+                            && diagonal.color_white != self.color_white)
+                            || (board[start.0][start.1 + 1].passant == true
+                                && board[start.0 + 1][start.1].kind == PieceKind::None)
+                        {
+                            allowed_board[start.0 + 1][start.1 + 1] = true;
+                        }
+                    }
+                    if start.1 > 0 {
+                        let diagonal = &board[start.0 + 1][start.1 - 1];
+                        if (diagonal.kind != PieceKind::None
+                            && diagonal.color_white != self.color_white)
+                            || (board[start.0][start.1 - 1].passant == true
+                                && board[start.0 + 1][start.1].kind == PieceKind::None)
+                        {
+                            allowed_board[start.0 + 1][start.1 - 1] = true;
+                        }
                     }
                 }
             } else {
-                if start.0 == 1 {
-                    //jump two steps if on starting position
-                    if board[start.0 + 2][start.1].kind == PieceKind::None && board[start.0 + 1][start.1].kind == PieceKind::None {
-                        allowed_board[start.0 + 2][start.1] = true;
+                if self.color_white {
+                    if start.0 >= 1 {
+                        if start.1 + 1 < 8 {
+                            if &board[start.0 - 1][start.1 + 1].kind == &PieceKind::King
+                                && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white
+                            {
+                                return (true, 1);
+                            }
+                        }
+                        if start.1 >= 1 {
+                            if &board[start.0 - 1][start.1 - 1].kind == &PieceKind::King
+                                && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white
+                            {
+                                return (true, 1);
+                            }
+                        }
                     }
-                }
-                //jump 1 step forward
-                if board[start.0 + 1][start.1].kind == PieceKind::None {
-                    allowed_board[start.0 + 1][start.1] = true;
-                }
-                //eliminate forward diagonally, and potentionally allow for a passant
-                if start.1 < 7 {
-                    let diagonal = &board[start.0 + 1][start.1 + 1];
-                    if (diagonal.kind != PieceKind::None
-                        && diagonal.color_white != self.color_white)
-                        || (board[start.0][start.1 + 1].passant == true && board[start.0 + 1][start.1].kind == PieceKind::None)
-                    {
-                        allowed_board[start.0 + 1][start.1 + 1] = true;
-                    }
-                }
-                if start.1 > 0 {
-                    let diagonal = &board[start.0 + 1][start.1 - 1];
-                    if (diagonal.kind != PieceKind::None
-                        && diagonal.color_white != self.color_white)
-                        || (board[start.0][start.1 - 1].passant == true && board[start.0 + 1][start.1].kind == PieceKind::None)
-                    {
-                        allowed_board[start.0 + 1][start.1 - 1] = true;
+                } else {
+                    if start.0 + 1 < 8 {
+                        if start.1 + 1 < 8 {
+                            if &board[start.0 + 1][start.1 + 1].kind == &PieceKind::King
+                                && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white
+                            {
+                                return (true, 1);
+                            }
+                        }
+                        if start.1 >= 1 {
+                            if &board[start.0 + 1][start.1 - 1].kind == &PieceKind::King
+                                && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white
+                            {
+                                return (true, 1);
+                            }
+                        }
                     }
                 }
             }
-        } else {
-            if self.color_white {
-                if start.0 >= 1 {
-                if start.1 + 1 < 8 {
-                if &board[start.0 - 1][start.1 + 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
-                    return (true,1)
-                }}
-                if start.1 >= 1 {
-                if &board[start.0 - 1][start.1 - 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
-                    return (true,1)
-                }}}
-            } else {
-                if start.0 + 1 < 8 {
-                    if start.1 + 1 < 8 {
-                    if &board[start.0 + 1][start.1 + 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
-                        return (true,1)
-                    }}
-                    if start.1 >= 1 {
-                    if &board[start.0 + 1][start.1 - 1].kind == &PieceKind::King && &board[start.0 - 1][start.1 + 1].color_white != &self.color_white {
-                        return (true,1)
-                    }}}
-            }
-        }
         }
 
         //Pieces travelling straight will use these calculations
@@ -231,25 +281,19 @@ impl Piece {
                     (-1, -2),
                 ];
                 for pmove in moves {
-                    println!("im reached, {:?}", pmove);
                     if ((pmove.0 < 0 && stop.0 as i8 >= -(pmove.0))
                         || (pmove.0 >= 0 && pmove.0 as usize + stop.0 < 7))
                         && ((pmove.1 < 0 && stop.1 as i8 >= -(pmove.1))
                             || (pmove.1 >= 0 && pmove.1 as usize + stop.1 < 7))
                     {
-                        println!("{:?}", stop.1 as i8 + pmove.1);
                         let coordinate = (stop.0 as i8 + pmove.0, stop.1 as i8 + pmove.1);
                         let location = &board[coordinate.0 as usize][coordinate.1 as usize];
 
-                        println!("{:?}, stop is {:?}", pmove, stop);
-                        println!("{:?}", location);
                         if location.kind == PieceKind::King
                             && location.color_white != self.color_white
                         {
                             return (true, 1);
                         }
-                    } else {
-                        println!("{:?} was not checked from {:?}", pmove, stop);
                     }
                 }
             }
@@ -257,7 +301,6 @@ impl Piece {
 
         //King
         if self.kind == PieceKind::King {
-            println!("reconized as king");
             //calculate legal move from the target square?
             let adjacent_tiles = [
                 (1, 0),
@@ -270,7 +313,6 @@ impl Piece {
                 (1, -1),
             ];
             allowed_board = king_scan!(start, board, allowed_board, adjacent_tiles);
-            //println!("{:?}", allowed_board);
         }
 
         if !check_for_check {
@@ -287,7 +329,6 @@ impl Piece {
             for i in 0..8 {
                 for j in 0..8 {
                     if locked_board[i][j] == true {
-                        println!("{},{} locked", i, j);
                         board[i][j].locked = self.unique_name;
                     }
                 }
