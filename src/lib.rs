@@ -233,15 +233,42 @@ mod tests {
     }
     #[test]
     fn king_can_castle_right() {
-        panic!()
+        let mut game1 = crate::Game::new_game();
+        let moves = ["G8H6\n", "A2A3\n", "E7E6\n", "A3A4\n", "F8E7\n", "A4A5\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("E8G8\n".to_owned()).is_ok());
     }
     #[test]
     fn king_can_castle_left() {
-        panic!()
+        let mut game1 = crate::Game::new_game();
+        let moves = [
+            "B8A6\n", "A2A3\n", "D7D6\n", "A3A4\n", "C8E6\n", "A4A5\n", "D8D7\n", "B2B3\n",
+        ];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        assert!(game1.player_move("E8C8\n".to_owned()).is_ok());
     }
     #[test]
     fn fifty_move_rule() {
-        panic!()
+        let mut game1 = crate::Game::new_game();
+        let moves = ["E7E6\n", "E2E3\n"];
+        for pmove in moves {
+            let _ = game1.player_move(pmove.to_owned());
+        }
+        for _ in 0..13 {
+            let _ = game1.player_move("E8E7\n".to_owned());
+            let _ = game1.player_move("E1E2\n".to_owned());
+            let _ = game1.player_move("E7E8\n".to_owned());
+            let _ = game1.player_move("E2E1\n".to_owned());
+        }
+        assert!(game1.claim_draw());
+    }
+    #[test]
+    fn pawn_promotion() {
+        panic!();
     }
 }
 
@@ -268,8 +295,8 @@ pub struct Game {
     pub locked_table: HashMap<u8, u8>,
     pub check_mate: bool,
     pub tie: bool,
-    pub fifty_moves: VecDeque<Piece>,
-    pub dead_pieces: VecDeque<Piece>,
+    pub fifty_moves: VecDeque<(Piece, u8)>,
+    pub vector_of_the_fallen: VecDeque<Piece>,
 }
 
 impl Game {
@@ -280,11 +307,11 @@ impl Game {
         let (w_checked, b_checked) = (false, false);
         let locked_table = HashMap::new();
         let check_mate = false;
-        let mut fifty_moves: VecDeque<Piece> = VecDeque::with_capacity(50);
+        let mut fifty_moves: VecDeque<(Piece, u8)> = VecDeque::with_capacity(50);
         for _ in 0..50 {
-            fifty_moves.push_front(Piece::new_piece("bp"));
+            fifty_moves.push_front((Piece::new_piece("bp"), 0));
         }
-        let dead_pieces: VecDeque<Piece> = VecDeque::new();
+        let vector_of_the_fallen: VecDeque<Piece> = VecDeque::new();
         let tie = false;
 
         Game {
@@ -297,7 +324,7 @@ impl Game {
             check_mate,
             tie,
             fifty_moves,
-            dead_pieces,
+            vector_of_the_fallen,
         }
     }
     fn construct_board() -> [[Piece; 8]; 8] {
@@ -323,43 +350,88 @@ impl Game {
         }
         board
     }
+    pub fn claim_draw(&self) -> bool {
+        let mut found_pawn: bool = false;
+        for i in self.fifty_moves.iter() {
+            if i.0.kind == PieceKind::Pawn {
+                found_pawn = true;
+            }
+        }
+        let no_claim: bool = self.fifty_moves[0].1 == self.fifty_moves[49].1;
+        if !found_pawn && no_claim {
+            true
+        } else {
+            false
+        }
+    }
 
+    pub fn pawn_promotion(&mut self, input: String, to_piece: String) -> Result<bool, String> {
+        let verify_string = input.clone();
+        let verify_string = [input].join(&verify_string);
+        let verify_string = [verify_string].join("\n");
+        let ((i, j), _) = match self.verify_input(&verify_string) {
+            Ok(e) => e,
+            Err(error) => return Err(error),
+        };
+        let piece = self.board[i][j];
+        let valid_pieces_white = ["wr", "wk", "wb", "wq"];
+        let valid_pieces_black = ["br", "bk", "bb", "bq"];
+        if piece.kind == PieceKind::Pawn {
+            if (i == 0 && !piece.color_white) || (i == 7 && piece.color_white) {
+                if piece.color_white && valid_pieces_white.contains(&to_piece.as_str()) {
+                    self.board[i][j] = Piece::new_piece(to_piece.as_str());
+                }
+                if !piece.color_white && valid_pieces_black.contains(&to_piece.as_str()) {
+                    self.board[i][j] = Piece::new_piece(to_piece.as_str());
+                }
+            }
+        }
+        return Ok(true);
+    }
+
+    fn verify_input(&self, input: &String) -> Result<((usize, usize), (usize, usize)), String> {
+        if input.len() < 5 {
+            return Err("false input".to_owned());
+        }
+
+        //Convertera user input till index
+        let table = ["A", "B", "C", "D", "E", "F", "G", "H"];
+        if !table.contains(&&input[0..1]) || !table.contains(&&input[2..3]) {
+            return Err("Invalid Input".to_owned());
+        }
+
+        //parse the digits and convert them to usize
+        let parsed = &input[1..2];
+        let from: usize = match parsed.parse::<usize>() {
+            Ok(value) => value.to_owned() - 1,
+            Err(error) => {
+                return Err(error.to_string());
+            }
+        };
+        //let from = from.to_owned();
+        //let from = from - 1;
+        let parsed = &input[3..4];
+        let to: usize = match parsed.parse::<usize>() {
+            Ok(value) => value.to_owned() - 1,
+            Err(error) => {
+                println!("{}", error);
+                return Err("Internal Error".to_owned());
+            }
+        };
+        //iterate digits from input
+        let i = table.iter().position(|&s| s == &input[0..1]).unwrap();
+        let j = table.iter().position(|&s| s == &input[2..3]).unwrap();
+        return Ok(((from, i), (to, j)));
+    }
     pub fn player_move(&mut self, input: String) -> Result<bool, String> {
         if self.check_mate {
             Ok(self.check_mate)
         } else {
             //verifiera user input
-            if input.len() < 5 {
-                return Err("Invalid input".to_owned());
-            }
-
-            //Convertera user input till index
-            let table = ["A", "B", "C", "D", "E", "F", "G", "H"];
-            if !table.contains(&&input[0..1]) || !table.contains(&&input[2..3]) {
-                return Err("Invalid Input".to_owned());
-            }
-
-            //parse the digits and convert them to usize
-            let parsed = &input[1..2];
-            let from: usize = match parsed.parse::<usize>() {
-                Ok(value) => value.to_owned() - 1,
-                Err(error) => {
-                    return Err(error.to_string());
-                }
+            let ((from, i), (to, j)) = match self.verify_input(&input) {
+                Ok(e) => e,
+                Err(err) => panic!("{:?}", err),
             };
-            //let from = from.to_owned();
-            //let from = from - 1;
-            let parsed = &input[3..4];
-            let to: usize = match parsed.parse::<usize>() {
-                Ok(value) => value.to_owned() - 1,
-                Err(error) => {
-                    println!("{}", error);
-                    return Err("Internal Error".to_owned());
-                }
-            };
-            //iterate digits from input
-            let i = table.iter().position(|&s| s == &input[0..1]).unwrap();
-            let j = table.iter().position(|&s| s == &input[2..3]).unwrap();
 
             //iterate board to update threat zone
             for x in 0..8 {
@@ -447,8 +519,48 @@ impl Game {
                 {
                     piece.passant = true;
                 }
+                piece.moved = true;
+                //if it captures a piece, move it to the Vector of the fallen
+                if self.board[to][j].kind != PieceKind::None {
+                    self.vector_of_the_fallen
+                        .push_front(self.board[to][j].clone());
+                }
+
+                //make the move
                 self.board[to][j] = piece.clone();
                 self.board[from][i] = Default::default();
+
+                //insert move in the move list
+                self.fifty_moves
+                    .push_front((piece.clone(), self.vector_of_the_fallen.len() as u8));
+                self.fifty_moves.pop_back();
+
+                //castling stuff
+                if piece.kind == PieceKind::King {
+                    match (from, i, to, j) {
+                        (7, 4, 7, 6) => {
+                            self.board[7][7].moved = true;
+                            self.board[7][5] = self.board[7][7].clone();
+                            self.board[7][7] = Default::default();
+                        }
+                        (7, 4, 7, 2) => {
+                            self.board[7][0].moved = true;
+                            self.board[7][3] = self.board[7][0].clone();
+                            self.board[7][0] = Default::default();
+                        }
+                        (0, 4, 0, 2) => {
+                            self.board[0][0].moved = true;
+                            self.board[0][3] = self.board[7][0].clone();
+                            self.board[0][0] = Default::default();
+                        }
+                        (0, 4, 0, 6) => {
+                            self.board[0][7].moved = true;
+                            self.board[0][5] = self.board[7][0].clone();
+                            self.board[0][7] = Default::default();
+                        }
+                        (_, _, _, _) => (),
+                    }
+                }
 
                 //scan to see if the moved piece is checking the king.
                 let (check_scan, locked_counter) =
@@ -545,7 +657,6 @@ impl Game {
                         }
                     }
                 }
-
                 Ok(true)
             } else {
                 return Err("Illegal move".to_owned());

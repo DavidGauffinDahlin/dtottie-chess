@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum PieceKind {
     None,
     Pawn,
@@ -15,7 +15,7 @@ pub enum PieceKind {
 //     }
 // }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub struct Piece {
     pub id: char,
     pub kind: PieceKind,
@@ -25,6 +25,9 @@ pub struct Piece {
 
     //only used for pawns
     pub passant: bool,
+
+    //only used for rook and king
+    pub moved: bool,
 }
 
 impl Default for Piece {
@@ -36,6 +39,7 @@ impl Default for Piece {
             unique_name: 0,
             locked: 0,
             passant: false,
+            moved: false,
         }
     }
 }
@@ -61,6 +65,7 @@ impl Piece {
         let unique_name = 0;
         let locked = 0;
         let passant = false;
+        let moved = false;
         Piece {
             id,
             kind,
@@ -68,6 +73,7 @@ impl Piece {
             unique_name,
             locked,
             passant,
+            moved,
         }
     }
 
@@ -313,6 +319,37 @@ impl Piece {
                 (1, -1),
             ];
             allowed_board = king_scan!(start, board, allowed_board, adjacent_tiles);
+            if start == (7, 4) || start == (0, 4) && self.moved == false {
+                if self.color_white {
+                    if board[7][5].kind == PieceKind::None
+                        && board[7][6].kind == PieceKind::None
+                        && (board[7][7].kind == PieceKind::Rook && board[7][7].moved == false)
+                    {
+                        allowed_board[7][6] = true;
+                    }
+                    if board[7][3].kind == PieceKind::None
+                        && board[7][2].kind == PieceKind::None
+                        && board[7][1].kind == PieceKind::None
+                        && (board[7][0].kind == PieceKind::Rook && board[7][0].moved == false)
+                    {
+                        allowed_board[7][2] = true;
+                    }
+                } else {
+                    if board[0][5].kind == PieceKind::None
+                        && board[0][6].kind == PieceKind::None
+                        && (board[0][7].kind == PieceKind::Rook && board[0][7].moved == false)
+                    {
+                        allowed_board[0][6] = true;
+                    }
+                    if board[0][3].kind == PieceKind::None
+                        && board[0][2].kind == PieceKind::None
+                        && board[0][1].kind == PieceKind::None
+                        && (board[0][0].kind == PieceKind::Rook && board[0][0].moved == false)
+                    {
+                        allowed_board[0][2] = true;
+                    }
+                }
+            }
         }
 
         if !check_for_check {
