@@ -352,16 +352,6 @@ impl Piece {
             }
         }
 
-        if !check_for_check {
-            for i in 0..8 as usize {
-                print!("{}  ", i + 1);
-                for j in 0..8 as usize {
-                    print!("{} ", allowed_board[i][j]);
-                }
-                print!("\n");
-            }
-        }
-
         if check_for_check {
             for i in 0..8 {
                 for j in 0..8 {

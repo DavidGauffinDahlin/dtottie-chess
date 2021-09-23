@@ -266,10 +266,6 @@ mod tests {
         }
         assert!(game1.claim_draw());
     }
-    #[test]
-    fn pawn_promotion() {
-        panic!();
-    }
 }
 
 //TO IMPLEMENT (remove when there is a corresponding test)
