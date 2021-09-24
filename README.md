@@ -7,7 +7,7 @@ som totalt buggar ur koden, men isåfall är det bara att skapa en issue så fix
 
 Jag tror att jag implementerat det mesta. Jag har inte implementerat threefold repetition, men det kan jag göra om det krävs (kanske spara hashes av brädet eller något?). Det finns inte heller någon undo-funktion i spelet, men jag minns inte om det var något krav.
 
-**under example/ ligger den main.rs som jag använde när jag testade biblioteket**
+# **under example/ ligger den main.rs som jag använde när jag testade biblioteket**
 
 
 ## Game
