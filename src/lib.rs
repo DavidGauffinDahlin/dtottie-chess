@@ -286,12 +286,12 @@ pub struct Game {
     pub board: [[Piece; 8]; 8],
     pub score: (u8, u8),
     pub turn_white: bool,
-    pub w_checked: bool,
-    pub b_checked: bool,
-    pub locked_table: HashMap<u8, u8>,
+    w_checked: bool,
+    b_checked: bool,
+    locked_table: HashMap<u8, u8>,
     pub check_mate: bool,
     pub tie: bool,
-    pub fifty_moves: VecDeque<(Piece, u8)>,
+    fifty_moves: VecDeque<(Piece, u8)>,
     pub vector_of_the_fallen: VecDeque<Piece>,
 }
 

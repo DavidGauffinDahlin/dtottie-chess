@@ -77,7 +77,7 @@ impl Piece {
         }
     }
 
-    //the function where legal moves for all piece types is calculated.
+    //kan endast kallas på kungen, och kollar om kungen är i schack-matt
     pub fn check_mate(&self, board: &[[Piece; 8]; 8], position: (usize, usize)) -> bool {
         if self.kind == PieceKind::King {
             let mut allowed_board = [[false; 8]; 8];
