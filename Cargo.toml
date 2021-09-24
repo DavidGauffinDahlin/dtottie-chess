@@ -7,6 +7,4 @@ edition = "2018"
 
 [dependencies]
 
-[[bin]]
-name = "main"
-path = "src/main.rs"
+
