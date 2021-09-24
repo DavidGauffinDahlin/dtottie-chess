@@ -1,5 +1,5 @@
 # Schackmotor Dokumentation
-## Förord
+## Förord ##
 
 Till den som använder detta library: jag ber om ursäkt för den stökiga koden, det var väldigt många regler som jag inte kände till när jag gjorde kodskelettet, vilket ledde till att det blev många if-satser
 i Game::player_move() samt ett scan!-macro som kan vara lite svårt att följa då det innehåller många loopar och match statements. Det finns många förbättringar att göra, och jag har säkert missat något corner case i mina tester 
@@ -8,7 +8,7 @@ som totalt buggar ur koden, men isåfall är det bara att skapa en issue så fix
 Jag tror att jag implementerat det mesta. Jag har inte implementerat threefold repetition, men det kan jag göra om det krävs (kanske spara hashes av brädet eller något?). Det finns inte heller någon undo-funktion i spelet, men jag minns inte om det var något krav.
 
 
-##Game
+##Game##
 
 struct data du kan komma åt:
 board - spelbrädet, en mutable array [[Piece; 8];8], där varje ruta är en pjäs.
@@ -37,6 +37,6 @@ input: "A8"
 to_piece: "bb" (black bishop)
 Den validerar färgen på pjäsen och att det är en pawn, sen skapar den en ny pjäs på den platsen av typen som specificeras i to_piece. Parametrarna ska inte innehålla "\n"
 
-##Piece
+##Piece##
 
 Detta är annan viktig struct som finns, men den ska inte behöva användas för att nyttja detta library, utan bara om man vill ha lite info om pjäserna typ. 
