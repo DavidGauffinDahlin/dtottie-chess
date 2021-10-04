@@ -1,0 +1,1 @@
+C:\Users\46735\Documents\KTH\ Programming\Rust\dtottie-chess\target\debug\libdtottie_chess.rlib: C:\Users\46735\Documents\KTH\ Programming\Rust\dtottie-chess\dtottie-chess\src\lib.rs C:\Users\46735\Documents\KTH\ Programming\Rust\dtottie-chess\dtottie-chess\src\macros.rs C:\Users\46735\Documents\KTH\ Programming\Rust\dtottie-chess\dtottie-chess\src\pieces.rs

@@ -1,0 +1,13 @@
+c:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\target\debug\deps\lewton-756f06ed64e1727c.rmeta: C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\lib.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\header.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\header_cached.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\huffman_tree.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\imdct.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\audio.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\bitpacking.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\inside_ogg.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\samples.rs
+
+c:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\target\debug\deps\lewton-756f06ed64e1727c.d: C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\lib.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\header.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\header_cached.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\huffman_tree.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\imdct.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\audio.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\bitpacking.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\inside_ogg.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\samples.rs
+
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\lib.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\header.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\header_cached.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\huffman_tree.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\imdct.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\audio.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\bitpacking.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\inside_ogg.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\lewton-0.9.4\src\samples.rs:
