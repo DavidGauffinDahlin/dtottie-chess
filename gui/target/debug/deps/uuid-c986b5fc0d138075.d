@@ -1,0 +1,12 @@
+c:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\gui\target\debug\deps\uuid-c986b5fc0d138075.rmeta: C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\lib.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\builder\mod.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\builder\error.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\error.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\parser\mod.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\parser\error.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\prelude.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\adapter\mod.rs
+
+c:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\gui\target\debug\deps\uuid-c986b5fc0d138075.d: C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\lib.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\builder\mod.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\builder\error.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\error.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\parser\mod.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\parser\error.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\prelude.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\adapter\mod.rs
+
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\lib.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\builder\mod.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\builder\error.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\error.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\parser\mod.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\parser\error.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\prelude.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\uuid-0.8.2\src\adapter\mod.rs:

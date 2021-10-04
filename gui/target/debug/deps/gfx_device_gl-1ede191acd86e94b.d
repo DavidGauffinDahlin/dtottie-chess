@@ -1,0 +1,11 @@
+c:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\gui\target\debug\deps\gfx_device_gl-1ede191acd86e94b.rmeta: C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\lib.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\command.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\factory.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\info.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\shade.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\state.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\tex.rs
+
+c:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\gui\target\debug\deps\gfx_device_gl-1ede191acd86e94b.d: C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\lib.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\command.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\factory.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\info.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\shade.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\state.rs C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\tex.rs
+
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\lib.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\command.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\factory.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\info.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\shade.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\state.rs:
+C:\Users\46735\.cargo\registry\src\github.com-1ecc6299db9ec823\gfx_device_gl-0.16.2\src\tex.rs:

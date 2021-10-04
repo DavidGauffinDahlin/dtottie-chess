@@ -1,0 +1,2 @@
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=C:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\gui\target\debug\build\typenum-37cfc24681465cdd\out\consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=C:\Users\46735\Documents\KTH Programming\Rust\daniels_chess\gui\target\debug\build\typenum-37cfc24681465cdd\out\op.rs
